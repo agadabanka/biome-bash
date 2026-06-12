@@ -3,14 +3,33 @@
   "tagline": "Five toony fighters, five wild biomes — last toon standing.",
   "hero": "a roster of five toony brawlers (pick one; AI runs the rest)",
   "verb": "brawl · launch · KO",
-  "worlds": [],
-  "levelCount": null,
-  "controls": "on-screen + keyboard",
-  "art": "inherited base (re-skin me)",
-  "music": "procedural (add Lyria)",
-  "engine": "game-engine",
-  "builder": "/build.html",
-  "designLens": "/design.html",
-  "scaffolded_from": "agadabanka/studio-game-template",
-  "scaffolded_at": "2026-06-12T18:55:34.035Z"
+  "worlds": [
+    "Cumulus Courtyard (Clouds)",
+    "Canopy Clash (Jungle)",
+    "Caldera Rim (Volcano)",
+    "Glacier Shelf (Glacier)",
+    "Neon Rooftops (Neon City)"
+  ],
+  "roster": ["Puff", "Mango", "Cinder", "Glacia", "Volt"],
+  "levelCount": 5,
+  "controls": "←→ move · ↑/SPACE jump (multi) · Z attack · X heavy · C special · V shield · ↓ fastfall",
+  "art": "Gemini biome backdrops + keyart; characters are procedural Studio.Toon rigs (17-state animation machine)",
+  "music": "Lyria 2 — a composed loop per biome + title (6 tracks)",
+  "engine": "game-engine (studio/phaser-4)",
+  "archetype": "brawler",
+  "designLens": "flawless-victory gate: the champion autopilot wins every arena 1v3 without losing a stock, deterministically, on both renderers",
+  "scaffolded_from": "engine/game-template (local)",
+  "scaffolded_at": "2026-06-12",
+  "stages": {
+    "scaffold": "done",
+    "identity": "done",
+    "levels": "done",
+    "gate": "wip",
+    "feel": "done",
+    "hero": "done",
+    "art": "done",
+    "music": "done",
+    "deploy": "todo",
+    "videos": "todo"
+  }
 }
