@@ -35,11 +35,29 @@ never `Math.random`, so whole matches replay bit-identically), plus new Juice:
 expanding shockwave **rings**, directional **sparks**, floating combat **pop**
 text, **confetti**, attachable **trails**, and a brawl SFX set.
 
-## The gate, translated for a brawler
-The platformers gate on "0 deaths to the goal". A brawler's translation:
-**flawless victory** — the champion-iq autopilot must WIN the 1v3 match in
-every arena **without losing a single stock**, deterministically, on webgl AND
-canvas (`npm run eval`).
+## The gate, translated for a brawler — twice
+First translation: **flawless victory** — the champion autopilot must win every
+arena 1v3 without losing a stock. It worked (seed-scanning found flawless
+authored matches), but the owner called it mid-build: *"it's ok to lose a few
+times — use a better gate to maximize fun."* He was right — a 3-stock sweep is
+sterile; a comeback is a story.
+
+Second translation, the one that shipped: the **Brawl felt-fun gate**
+(`Studio.Brawl.fun`, the felt-fun heritage landing in a second genre). A match
+is scored 0–100 from its deterministic event log:
+- **action** — hits per second of fight time,
+- **flow** — no dead air between beats (KOs + heavy launches),
+- **arc** — the final KO lands late (the climax),
+- **closeness** — an earned win beats a sweep; surviving past 90% damage counts
+  as a comeback (falls are *good* now — the gate prefers a 1-stock-left win),
+- **variety** — specials flew, items mattered, KOs were shared around,
+- needing sudden death costs 15% (the match wasn't flowing).
+
+`npm run eval` passes an arena when the champion **wins** (falls allowed), the
+match scores **FUN ≥ 70**, two fresh 700-step runs are bit-identical, and the
+headless readback is non-black — on BOTH renderers. Arena seeds are then
+*authored matches*: the seed scanner replays candidates and bakes the
+highest-FUN winner into the level data, where determinism makes it permanent.
 
 ## Phaser 4 gotchas the engine now knows
 - **Persistent `Graphics` objects and camera GPU filters crash the WebGL

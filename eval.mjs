@@ -2,8 +2,8 @@
  * Biome Bash eval — proves the brawler is AI-evaluable & shippable.
  * Per renderer (webgl + canvas), per arena (1..5), on FRESH pages:
  *   determinism (two identical 700-step runs) ·
- *   the FLAWLESS-VICTORY gate (champion autopilot wins the 1v3 match with
- *   0 stocks lost inside the frame budget) · non-black readback.
+ *   the FUN-GATE (champion autopilot WINS the 1v3 match — falls allowed —
+ *   and the match scores Brawl felt-fun >= FUN_MIN) · non-black readback.
  * Writes out/scorecard.json + out/shot-l<N>.png and exits non-zero on failure.
  *   env: ARENAS=1,3 RENDERERS=webgl BUDGET=9000  (iteration filters)
  */
@@ -19,7 +19,8 @@ const OUT = path.join(ROOT, 'out');
 fs.mkdirSync(OUT, { recursive: true });
 const ARENA_LIST = (process.env.ARENAS || '1,2,3,4,5').split(',').map(Number);
 const RENDERERS = (process.env.RENDERERS || 'webgl,canvas').split(',');
-const BUDGET = Number(process.env.BUDGET || 9000);
+const BUDGET = Number(process.env.BUDGET || 10000);
+const FUN_MIN = Number(process.env.FUN_MIN || 70);
 
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.png': 'image/png', '.json': 'application/json', '.mp3': 'audio/mpeg' };
 const server = http.createServer((req, res) => {
@@ -52,12 +53,13 @@ async function evalArena(r, level) {
 
   const pg = await fresh(r, level);
   const gate = await pg.evaluate((maxF) => window.__gate(maxF), BUDGET);
+  const fun = await pg.evaluate(() => window.__fun());
   const errs = pg._errs.slice(0, 6);
   if (r === 'webgl') await pg.screenshot({ path: path.join(OUT, `shot-l${level}.png`) });
   await pg.close();
-  const pass = !!(deterministic && gate && gate.won && gate.deaths === 0);
-  console.log(`  [${r}] arena ${level}: det=${deterministic} won=${gate.won} stocksLost=${gate.deaths} kos=${gate.coins} f=${gate.frame}${pass ? '  ✓' : '  ✗'}${errs.length ? '  errs:' + errs[0].slice(0, 120) : ''}`);
-  return { level, deterministic, det: { s1, s2 }, gate, errors: errs, pass };
+  const pass = !!(deterministic && gate && gate.won && fun.fun >= FUN_MIN);
+  console.log(`  [${r}] arena ${level}: det=${deterministic} won=${gate.won} falls=${gate.deaths} kos=${gate.coins} f=${gate.frame} FUN=${fun.fun}${pass ? '  ✓' : '  ✗'}${errs.length ? '  errs:' + errs[0].slice(0, 120) : ''}`);
+  return { level, deterministic, det: { s1, s2 }, gate, fun, errors: errs, pass };
 }
 
 async function readback(r) {

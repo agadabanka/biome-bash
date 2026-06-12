@@ -10,14 +10,20 @@
     "Glacier Shelf (Glacier)",
     "Neon Rooftops (Neon City)"
   ],
-  "roster": ["Puff", "Mango", "Cinder", "Glacia", "Volt"],
+  "roster": [
+    "Puff",
+    "Mango",
+    "Cinder",
+    "Glacia",
+    "Volt"
+  ],
   "levelCount": 5,
   "controls": "←→ move · ↑/SPACE jump (multi) · Z attack · X heavy · C special · V shield · ↓ fastfall",
   "art": "Gemini biome backdrops + keyart; characters are procedural Studio.Toon rigs (17-state animation machine)",
   "music": "Lyria 2 — a composed loop per biome + title (6 tracks)",
   "engine": "game-engine (studio/phaser-4)",
   "archetype": "brawler",
-  "designLens": "flawless-victory gate: the champion autopilot wins every arena 1v3 without losing a stock, deterministically, on both renderers",
+  "designLens": "the Brawl felt-fun gate: champion wins every arena 1v3 (falls allowed, comebacks preferred) AND the match event-log scores FUN >= 70 (action/flow/arc/closeness/variety), deterministic on both renderers; arena seeds are authored max-FUN matches",
   "scaffolded_from": "engine/game-template (local)",
   "scaffolded_at": "2026-06-12",
   "stages": {

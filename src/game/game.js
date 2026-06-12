@@ -212,6 +212,7 @@
       f.rig.root.setDepth(10 + i);
     }
     player = world.fighters[0];
+    window.__mlog = [];
     wireFx();
     if (hud) hud.reset();
   }
@@ -231,6 +232,7 @@
     world.fx = {
       swing: function (f, name) { if (name === 'heavy') Studio.Audio.sfx('whoosh'); },
       special: function (f) {
+        (window.__mlog = window.__mlog || []).push({ t: 'special', f: world.frame, who: f.def.key });
         Studio.Juice.ring(scene, f.s.x, f.s.y, { tint: f.def.tint, r0: 10, r1: 60, dur: 240 });
         Studio.Juice.pop(scene, f.s.x, f.s.y - 56, f.def.special.name + '!', { color: hex(f.def.tint), size: 15 });
       },
@@ -269,6 +271,7 @@
         Studio.Juice.burst(scene, x, y, { n: 8, tint: 0xffd166, life: 360, scale: 0.5 });
       },
       item: function (f, type, x, y) {
+        (window.__mlog = window.__mlog || []).push({ t: 'item', f: world.frame, who: f.def.key, type: type });
         var names = { heal: 'HEAL!', power: 'POWER UP!', speed: 'SPEED!', shield: 'SHIELD!', bomb: 'BOMB!' };
         var tints = { heal: 0xff5d8f, power: 0xffb703, speed: 0xffd60a, shield: 0x4cc9f0, bomb: 0xff6d00 };
         Studio.Juice.burst(scene, x, y, { n: 12, tint: tints[type], life: 420, scale: 0.7 });
@@ -285,7 +288,9 @@
       shotEnd: function (sh) { Studio.Juice.burst(scene, sh.x, sh.y, { n: 5, tint: 0xdfe7ff, life: 220, scale: 0.45 }); },
       freeze: function (v) { tintRig(v, 0x9bd6ff); Studio.Juice.burst(scene, v.s.x, v.s.y, { n: 10, tint: 0x9bf6ff, life: 380, texture: 'shard' }); Studio.Audio.sfx('freeze'); },
       thaw: function (v) { clearRigTint(v); Studio.Juice.burst(scene, v.s.x, v.s.y, { n: 6, tint: 0xdff6ff, life: 260, texture: 'shard', scale: 0.5 }); },
-      sudden: function () { announce('SUDDEN DEATH!', '#ff4d6d', 44); Studio.Juice.flash(scene, 160, 255, 80, 80); Studio.Audio.sfx('go'); },
+      sudden: function () {
+        (window.__mlog = window.__mlog || []).push({ t: 'sudden', f: world.frame });
+        announce('SUDDEN DEATH!', '#ff4d6d', 44); Studio.Juice.flash(scene, 160, 255, 80, 80); Studio.Audio.sfx('go'); },
       gameover: function (winner) {
         if (winner) {
           announce(winner.def.name + ' WINS!', hex(winner.def.tint), 48);
@@ -404,6 +409,12 @@
         reset: function () { buildMatch(); }
       });
       window.__game.showcase = function (on) { auto = !!on; };
+      window.__fun = function () {
+        return Studio.Brawl.fun(window.__mlog || [], {
+          playerKey: player.def.key, frame: world.frame, falls: player.falls,
+          stocks: 3, won: !!(world.over && world.winner === player), fightStart: COUNTDOWN
+        });
+      };
       window.__game.collect = function () {};
     },
     update: function (_, dms) {

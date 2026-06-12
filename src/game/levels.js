@@ -7,7 +7,7 @@
  */
 window.ARENAS = [
   {
-    name: 'Cumulus Courtyard', biome: 'Clouds', key: 'clouds', seed: 11,
+    name: 'Cumulus Courtyard', biome: 'Clouds', key: 'clouds', seed: 9, // authored match: flawless champion run (f4485)
     width: 960, height: 540,
     sky: { top: 0x7fb8ff, bottom: 0xdff1ff },
     layers: [
@@ -25,7 +25,7 @@ window.ARENAS = [
     items: [{ x: 480, y: 392 }, { x: 310, y: 272 }, { x: 650, y: 272 }, { x: 480, y: 172 }]
   },
   {
-    name: 'Canopy Clash', biome: 'Jungle', key: 'jungle', seed: 22,
+    name: 'Canopy Clash', biome: 'Jungle', key: 'jungle', seed: 5, // authored match: flawless champion run (f5567)
     width: 960, height: 540,
     sky: { top: 0x14452f, bottom: 0x5da271 },
     layers: [

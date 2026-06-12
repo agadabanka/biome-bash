@@ -21,12 +21,13 @@ async function run(seed) {
     await p.goto(`${BASE}/?r=webgl&level=${ARENA}&seed=${seed}&mute=1`, { waitUntil: 'load', timeout: 45000 });
     await p.waitForFunction(() => window.__ready === true, { timeout: 20000 });
     const s = await p.evaluate(() => window.__gate(10000));
-    results.push({ seed, won: s.won, deaths: s.deaths, kos: s.coins, frame: s.frame });
-    console.log(`  seed ${seed}: won=${s.won} falls=${s.deaths} kos=${s.coins} f=${s.frame}${s.won && s.deaths === 0 ? '  ★ FLAWLESS' : ''}`);
+    const fun = await p.evaluate(() => window.__fun());
+    results.push({ seed, won: s.won, deaths: s.deaths, kos: s.coins, frame: s.frame, fun: fun.fun, parts: fun.parts });
+    console.log(`  seed ${seed}: won=${s.won} falls=${s.deaths} kos=${s.coins} f=${s.frame} FUN=${fun.fun} ${JSON.stringify(fun.parts)}${s.won && fun.fun >= 70 ? '  ★' : ''}`);
   } catch (e) { results.push({ seed, err: String(e).slice(0, 80) }); console.log(`  seed ${seed}: ERR`); }
   await p.close();
 }
 for (let i = 0; i < seeds.length; i += PAR) await Promise.all(seeds.slice(i, i + PAR).map(run));
 await browser.close(); server.close();
-const flawless = results.filter(r => r.won && r.deaths === 0);
-console.log(`ARENA ${ARENA}: ${flawless.length} flawless of ${results.length} → ${flawless.map(r => r.seed + '(f' + r.frame + ')').join(', ') || 'none'}`);
+const winners = results.filter(r => r.won && r.deaths < 3).sort((a, b) => b.fun - a.fun);
+console.log(`ARENA ${ARENA}: best by FUN → ${winners.slice(0, 3).map(r => `seed ${r.seed} FUN=${r.fun} falls=${r.deaths} f=${r.frame}`).join(' | ') || 'none won'}`);
