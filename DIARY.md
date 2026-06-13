@@ -103,6 +103,22 @@ seed 7 returns the same won/falls/frame/KOs and the same FUN 100 either way — 
 runs in **1.5s instead of ~100s (~70x)**. The 6-hour scan became ~2 minutes.
 Every future rng-driven game inherits headless seed-scanning.
 
+## The "unplayable" bug — what the gate couldn't see
+The owner tried the live build and it was **unplayable** — and he was right. The
+character-select screen threw `this.confirm is not a function` the instant you
+chose a fighter, so you could never start a match. Root cause: **Phaser 4 only
+binds a scene's lifecycle hooks** (`create`/`update`/…) from a plain-object
+config — arbitrary methods (`confirm`/`refresh`/`move`) are NOT attached to the
+scene instance, so `this.confirm()` was undefined. Fix: the menu logic now lives
+as scene-bound closures inside `create()`.
+
+The deeper lesson: **the gate boots `?level=N` straight into gameplay, so it
+never touched the menu** — every arena passed while the front door was broken.
+The eval now carries a **menu smoke-test**: a simulated human presses through
+Title → Select → Play and the gate asserts the player actually *moves* under
+keyboard input (x changes both directions), with zero page errors. A human-only
+path is now part of the ship bar, on both renderers.
+
 ## Art & music
 - **Backdrops**: five Gemini biome paintings (16:9, bottom third kept
   gameplay-clean) + title keyart of the whole roster. Characters deliberately
