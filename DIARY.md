@@ -146,6 +146,19 @@ over a sweep.
 campaign also exercises all five fighters as the player (one per biome), so the
 gate covers the whole roster.
 
+## Videos — the ultimate step
+All five authored matches recorded off the deterministic stepper (each biome's
+Lyria loop muxed in) plus a 43s montage, uploaded to YouTube:
+
+| Arena | Biome | Video |
+|-------|-------|-------|
+| 1 Cumulus Courtyard | Clouds | https://youtu.be/2ucrDdId2A8 |
+| 2 Canopy Clash | Jungle | https://youtu.be/FtH1WD8GfsU |
+| 3 Caldera Rim | Volcano | https://youtu.be/4zOxin986fo |
+| 4 Glacier Shelf | Glacier | https://youtu.be/t5fkqv8BALU |
+| 5 Neon Rooftops | Neon City | https://youtu.be/GvqKb5F_aN0 |
+| Montage | all five | https://youtu.be/00oN2f5-sgI |
+
 ## Scorecard
 - **Gate:** the Brawl fun-gate — deterministic + champion WINS + match FUN ≥ 70,
   on **webgl + canvas**. All five arenas pass (FUN 85–100).

@@ -64,8 +64,10 @@ async function clipSeg(tag, src, start, dur, name, feat) {
   await png(capf, cap(name, feat), true);
   ff(['-ss', String(start), '-t', String(dur + 0.5), '-i', src, '-loop', '1', '-t', String(dur), '-i', capf,
     '-filter_complex',
-    `[0:v]scale=${W}:${H},fps=${FPS},setsar=1,setpts=PTS-STARTPTS[g];[1:v]format=rgba,fade=t=in:st=0.25:d=0.4:alpha=1,fade=t=out:st=${(dur - 0.7).toFixed(2)}:d=0.4:alpha=1[c];[g][c]overlay=0:0,format=yuv420p[v]`,
-    '-map', '[v]', '-t', String(dur), '-an', '-c:v', 'libx264', '-crf', '18', '-pix_fmt', 'yuv420p', out]);
+    // re-assert fps AFTER overlay: the caption PNG-loop drags the overlay output
+    // to 25fps otherwise, and xfade rejects mismatched framerates (-22).
+    `[0:v]scale=${W}:${H},fps=${FPS},setsar=1,setpts=PTS-STARTPTS[g];[1:v]format=rgba,fade=t=in:st=0.25:d=0.4:alpha=1,fade=t=out:st=${(dur - 0.7).toFixed(2)}:d=0.4:alpha=1[c];[g][c]overlay=0:0,fps=${FPS},format=yuv420p[v]`,
+    '-map', '[v]', '-t', String(dur), '-an', '-r', String(FPS), '-c:v', 'libx264', '-crf', '18', '-pix_fmt', 'yuv420p', out]);
   segs.push({ f: out, dur });
 }
 

@@ -36,7 +36,7 @@
     "art": "done",
     "music": "done",
     "deploy": "todo",
-    "videos": "todo"
+    "videos": "done"
   },
   "scorecard": {
     "date": "2026-06-13",
@@ -51,5 +51,13 @@
       "neon": 100
     },
     "everyWinAComeback": true
+  },
+  "videos": {
+    "biome-bash-level-1-cumulus-courtyard": "https://youtu.be/2ucrDdId2A8",
+    "biome-bash-level-2-canopy-clash": "https://youtu.be/FtH1WD8GfsU",
+    "biome-bash-level-3-caldera-rim": "https://youtu.be/4zOxin986fo",
+    "biome-bash-level-4-glacier-shelf": "https://youtu.be/t5fkqv8BALU",
+    "biome-bash-level-5-neon-rooftops": "https://youtu.be/GvqKb5F_aN0",
+    "biome-bash-montage": "https://youtu.be/00oN2f5-sgI"
   }
 }
