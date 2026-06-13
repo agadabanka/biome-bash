@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Biome Bash — Stage Select &amp; Roster</title>
+<style>
+  :root { --bg:#0b1020; --card:#141a2c; --line:#2b3a57; --ink:#e8eefc; --dim:#9fb3e0; --accent:#ffd34d; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:system-ui,Segoe UI,Roboto,sans-serif; line-height:1.5; }
+  header { padding:18px 22px; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:14px; position:sticky; top:0; background:rgba(11,16,32,.96); z-index:5; }
+  header h1 { font-size:20px; margin:0; }
+  header a { color:#9fd6ff; text-decoration:none; font-size:14px; }
+  .wrap { max-width:1080px; margin:0 auto; padding:24px; }
+  h2 { font-size:14px; letter-spacing:.06em; text-transform:uppercase; color:var(--accent); border-bottom:1px solid var(--line); padding-bottom:8px; margin-top:30px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; margin-top:14px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:14px; overflow:hidden; transition:transform .12s, border-color .12s; }
+  .card:hover { transform:translateY(-3px); border-color:#3f5688; }
+  .card .shot { width:100%; aspect-ratio:16/9; object-fit:cover; background:#0c1224; display:block; }
+  .card .body { padding:12px 14px; }
+  .card .nm { font-weight:700; font-size:16px; }
+  .card .bi { font-size:12px; color:var(--dim); margin-top:2px; }
+  .card .desc { font-size:12px; color:#b9c8ec; margin-top:8px; min-height:32px; }
+  .card a.play { display:inline-block; margin-top:10px; background:var(--accent); color:#1a1205; font-weight:700; text-decoration:none; padding:7px 14px; border-radius:8px; font-size:13px; }
+  .roster { display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:14px; margin-top:14px; }
+  .fighter { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px; text-align:center; }
+  .fighter .av { width:84px; height:84px; margin:0 auto 8px; }
+  .fighter .fn { font-weight:700; font-size:15px; }
+  .fighter .bi { font-size:11px; color:var(--dim); }
+  .fighter .stats { font-size:11px; color:#9fb4d8; margin-top:6px; }
+  .fighter .sp { font-size:12px; color:var(--accent); font-weight:700; margin-top:4px; }
+  .fighter a.play { display:inline-block; margin-top:9px; font-size:12px; color:#9fd6ff; text-decoration:none; }
+  .lead { color:var(--dim); font-size:14px; margin:6px 0 0; }
+</style>
+</head>
+<body>
+<header>
+  <h1>🧱 Biome Bash — Stage Select &amp; Roster</h1>
+  <a href="/">← back to the game</a>
+</header>
+<div class="wrap">
+  <p class="lead">Jump straight into any biome arena, or scout the five fighters. Each arena boots the authored AI match used for the gate and the videos.</p>
+  <h2>Arenas</h2>
+  <div id="arenas" class="grid"></div>
+  <h2>Roster</h2>
+  <div id="roster" class="roster"></div>
+</div>
+<script src="./game/levels.js"></script>
+<script src="./game/characters.js"></script>
+<script>
+  const hex = n => '#' + ('00000'+(n>>>0).toString(16)).slice(-6);
+  const arenas = window.ARENAS || window.LEVELS || [];
+  const chars = window.CHARACTERS || [];
+  // arenas → stage cards (thumbnail from committed diary-shots, play link by index)
+  document.getElementById('arenas').innerHTML = arenas.map((a,i)=>{
+    const n=i+1, shot='diary-shots/arena'+n+'.png';
+    return `<div class="card">
+      <img class="shot" src="${shot}" alt="${a.name}" onerror="this.style.opacity=.15;this.src='';" />
+      <div class="body">
+        <div class="nm">${a.name||('Arena '+n)}</div>
+        <div class="bi">${(a.biome||'').toUpperCase()}</div>
+        <div class="desc">${a.stage2?'A split twin-platform stage.':'A floating-platform stage.'} Spawns: ${(a.spawns||[]).length} · power-up drops: ${(a.items||[]).length}.</div>
+        <a class="play" href="/?level=${n}" target="_blank" rel="noopener">▶ Play this arena</a>
+      </div></div>`;
+  }).join('') || '<p class="lead">No arenas found.</p>';
+  // roster → fighter cards (procedural rig avatar via canvas if Studio present, else dot)
+  document.getElementById('roster').innerHTML = chars.map((c,i)=>{
+    const spd=Math.round((c.speed-200)/10), pwr=Math.round((c.weight||100)/12), air=(c.airJumps||1)+1;
+    return `<div class="fighter">
+      <div class="av"><canvas id="av${i}" width="84" height="84"></canvas></div>
+      <div class="fn" style="color:${hex(c.tint||0xffffff)}">${c.name}</div>
+      <div class="bi">${c.biome||''}</div>
+      <div class="stats">SPD ${spd} · PWR ${pwr} · AIR ${air}</div>
+      <div class="sp">${c.special?c.special.name:''}</div>
+      <a class="play" href="/?level=${i+1}&char=${c.key}" target="_blank" rel="noopener">▶ Play as ${c.name}</a>
+    </div>`;
+  }).join('') || '<p class="lead">No roster found.</p>';
+  // simple body-blob avatars (no Phaser needed): a rounded body in the tint + face
+  chars.forEach((c,i)=>{
+    const cv=document.getElementById('av'+i); if(!cv) return; const g=cv.getContext('2d');
+    const col=hex(c.tint||0xffffff), W=84,H=84, bw=46,bh=48, x=(W-bw)/2, y=(H-bh)/2;
+    g.fillStyle='#1d1d28'; rr(g,x-3,y-3,bw+6,bh+6,16); g.fill();
+    g.fillStyle=col; rr(g,x,y,bw,bh,13); g.fill();
+    g.fillStyle='rgba(255,255,255,.28)'; rr(g,x,y,bw,bh*0.45,13); g.fill();
+    g.fillStyle='#fff'; g.beginPath(); g.ellipse(x+bw*0.36,y+bh*0.42,7,8,0,0,7); g.fill(); g.beginPath(); g.ellipse(x+bw*0.64,y+bh*0.42,7,8,0,0,7); g.fill();
+    g.fillStyle='#14141e'; g.beginPath(); g.arc(x+bw*0.36,y+bh*0.44,3,0,7); g.fill(); g.beginPath(); g.arc(x+bw*0.64,y+bh*0.44,3,0,7); g.fill();
+    g.strokeStyle='#1d1d28'; g.lineWidth=2.5; g.beginPath(); g.arc(x+bw*0.5,y+bh*0.62,6,0.2,Math.PI-0.2); g.stroke();
+  });
+  function rr(g,x,y,w,h,r){ g.beginPath(); g.moveTo(x+r,y); g.arcTo(x+w,y,x+w,y+h,r); g.arcTo(x+w,y+h,x,y+h,r); g.arcTo(x,y+h,x,y,r); g.arcTo(x,y,x+w,y,r); g.closePath(); }
+</script>
+</body>
+</html>

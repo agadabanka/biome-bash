@@ -4,6 +4,8 @@
 > A Smash-style platform brawler: you pick one fighter, the engine's CPU brains
 > run the other three, and every arena is a different biome.
 
+![Biome Bash — the title parade of all five fighters](diary-shots/title.png)
+
 ### Day one — scaffolded from the engine (2026-06-12)
 - Created with `new-game --local` off `engine/game-template`: the Phaser 4 +
   Studio SDK base, already wired to the whole stack (server/store · eval
@@ -12,7 +14,7 @@
   **variety** — Clouds · Jungle · Volcano · Glacier · Neon City, one home
   fighter per biome: **Puff, Mango, Cinder, Glacia, Volt**.
 
-## Three engine investments this game funded
+### Three engine investments this game funded
 **`Studio.Toon`** — procedural toony character rigs: a chibi body baked from a
 palette def (shape + accessories: ears/horns/antenna/crest/tail/tuft/visor/leaf),
 floating Rayman hands and feet, a full face (eyes/pupils/brows/five mouths,
@@ -35,7 +37,7 @@ never `Math.random`, so whole matches replay bit-identically), plus new Juice:
 expanding shockwave **rings**, directional **sparks**, floating combat **pop**
 text, **confetti**, attachable **trails**, and a brawl SFX set.
 
-## The gate, translated for a brawler — twice
+### The gate, translated for a brawler — twice
 First translation: **flawless victory** — the champion autopilot must win every
 arena 1v3 without losing a stock. It worked (seed-scanning found flawless
 authored matches), but the owner called it mid-build: *"it's ok to lose a few
@@ -59,7 +61,7 @@ headless readback is non-black — on BOTH renderers. Arena seeds are then
 *authored matches*: the seed scanner replays candidates and bakes the
 highest-FUN winner into the level data, where determinism makes it permanent.
 
-## Phaser 4 gotchas the engine now knows
+### Phaser 4 gotchas the engine now knows
 - **Persistent `Graphics` objects and camera GPU filters crash the WebGL
   renderer when Containers are in the display list** (`null.resolution` deep in
   the render pass). Fix: bake all panels/strokes to textures (`BAKE_CARD`), skip
@@ -67,7 +69,7 @@ highest-FUN winner into the level data, where determinism makes it permanent.
 - **Re-baking a texture a live rig is using crashes the renderer** — Phaser
   keeps no refcount. `Studio.Toon.bake` is now idempotent per character key.
 
-## Teaching the CPU not to die (the autopsy loop)
+### Teaching the CPU not to die (the autopsy loop)
 A flight recorder (`window.__tape`, last 110 player frames, dumped per KO) +
 `trace.mjs`/`autopsy.mjs` turned every champion death into a diagnosis:
 - **Jump latch** — CPUs held the jump key forever, so air jumps never
@@ -87,7 +89,7 @@ A flight recorder (`window.__tape`, last 110 player frames, dumped per KO) +
   stocks 2 vs your 3 (the classic 1-v-many handicap), endgame aggression
   (no 1v1 zoning stalls), sudden death at 2:00.
 
-## The headless unlock (engine investment)
+### The headless unlock (engine investment)
 Scanning for authored max-FUN matches meant simulating whole 110-second matches
 over and over — and under software GL each one rendered ~7,000 frames at a crawl
 (~100s each). A full 5-arena seed scan was a **6-hour** job.
@@ -103,7 +105,7 @@ seed 7 returns the same won/falls/frame/KOs and the same FUN 100 either way — 
 runs in **1.5s instead of ~100s (~70x)**. The 6-hour scan became ~2 minutes.
 Every future rng-driven game inherits headless seed-scanning.
 
-## The "unplayable" bug — what the gate couldn't see
+### The "unplayable" bug — what the gate couldn't see
 The owner tried the live build and it was **unplayable** — and he was right. The
 character-select screen threw `this.confirm is not a function` the instant you
 chose a fighter, so you could never start a match. Root cause: **Phaser 4 only
@@ -112,6 +114,8 @@ config — arbitrary methods (`confirm`/`refresh`/`move`) are NOT attached to th
 scene instance, so `this.confirm()` was undefined. Fix: the menu logic now lives
 as scene-bound closures inside `create()`.
 
+![The character-select screen — now reachable and playable](diary-shots/select.png)
+
 The deeper lesson: **the gate boots `?level=N` straight into gameplay, so it
 never touched the menu** — every arena passed while the front door was broken.
 The eval now carries a **menu smoke-test**: a simulated human presses through
@@ -119,7 +123,7 @@ Title → Select → Play and the gate asserts the player actually *moves* under
 keyboard input (x changes both directions), with zero page errors. A human-only
 path is now part of the ship bar, on both renderers.
 
-## Art & music
+### Art & music
 - **Backdrops**: five Gemini biome paintings (16:9, bottom third kept
   gameplay-clean) + title keyart of the whole roster. Characters deliberately
   stay procedural — the rigs ARE the on-model art, and the HUD portraits are
@@ -128,7 +132,9 @@ path is now part of the ship bar, on both renderers.
 - **Music**: six Lyria-composed loops (title + one per biome), trimmed to
   seamless ~29s mp3s.
 
-## The campaign (authored max-FUN matches)
+![Glacier Shelf — aurora over the ice](diary-shots/arena4.png)
+
+### The campaign (authored max-FUN matches)
 The seed scanner ran all five arenas headless; the highest-FUN winning seed per
 arena was baked in. Every winner is a **contested** win — the champion drops at
 least one stock and claws it back, which is exactly what the fun-gate rewards
@@ -146,7 +152,11 @@ over a sweep.
 campaign also exercises all five fighters as the player (one per biome), so the
 gate covers the whole roster.
 
-## Videos — the ultimate step
+![Caldera Rim — Cinder brawls on the volcano rim](diary-shots/arena3.png)
+![Canopy Clash — Mango in the jungle canopy](diary-shots/arena2.png)
+![Neon Rooftops — Volt on the neon skyline](diary-shots/arena1.png)
+
+### Videos — the ultimate step
 All five authored matches recorded off the deterministic stepper (each biome's
 Lyria loop muxed in) plus a 43s montage, uploaded to YouTube:
 
@@ -159,7 +169,7 @@ Lyria loop muxed in) plus a 43s montage, uploaded to YouTube:
 | 5 Neon Rooftops | Neon City | https://youtu.be/GvqKb5F_aN0 |
 | Montage | all five | https://youtu.be/00oN2f5-sgI |
 
-## Scorecard
+### Scorecard
 - **Gate:** the Brawl fun-gate — deterministic + champion WINS + match FUN ≥ 70,
   on **webgl + canvas**. All five arenas pass (FUN 85–100).
 - **Determinism:** two fresh 700-step runs are bit-identical per arena/renderer.
