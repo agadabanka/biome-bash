@@ -181,11 +181,10 @@
   var scene, world, player, roster, arena, auto = false, manualInput = {}, announceQ = [];
   var hud = null, padImgs = [], started = false;
 
-  function seedFor(arenaSpec, ros) {
-    if (P.seed) return (P.seed >>> 0) || 1;
-    var s = arenaSpec.seed * 7919;
-    for (var i = 0; i < ros.length; i++) for (var j = 0; j < ros[i].key.length; j++) s = (s * 31 + ros[i].key.charCodeAt(j)) >>> 0;
-    return s || 1;
+  // the arena seed IS the authored match (scan/eval/record must agree, so no
+  // roster mixing — the roster is fixed per arena: its home fighter leads)
+  function seedFor(arenaSpec) {
+    return ((P.seed || arenaSpec.seed) >>> 0) || 1;
   }
 
   function buildMatch() {
@@ -200,7 +199,7 @@
     padImgs.forEach(function (p) { p.destroy(); }); padImgs = [];
     started = false;
 
-    world = Studio.Brawl.world(scene, arena, seedFor(arena, roster));
+    world = Studio.Brawl.world(scene, arena, seedFor(arena));
     arena.spawns.forEach(function (sp) {
       padImgs.push(scene.add.image(sp.x, sp.y + 28, 'pad').setDepth(2).setAlpha(0.9));
     });
@@ -528,6 +527,16 @@
     scene: P.level > 0 ? [Play, Results, Title, Select] : [Title, Select, Play, Results]
   };
   var r = qs.get('r');
-  if (r === 'canvas') config.type = Phaser.CANVAS; else if (r === 'webgl') config.type = Phaser.WEBGL;
+  if (r === 'canvas') config.type = Phaser.CANVAS;
+  else if (r === 'webgl') config.type = Phaser.WEBGL;
+  else if (r === 'headless') {
+    // sim-only: no pixels, far faster for scan/gate. HEADLESS has no RAF canvas,
+    // so drive the loop off setTimeout or scene boot stalls before create();
+    // Studio._headless skips procedural texture generation (needs a renderer).
+    config.type = Phaser.HEADLESS;
+    config.fps = { forceSetTimeOut: true, target: 60 };
+    config.audio = { noAudio: true };
+    Studio._headless = true;
+  }
   window.game = new Phaser.Game(config);
 })();

@@ -39,11 +39,12 @@ async function fresh(r, level) {
   const errors = [];
   page.on('pageerror', e => errors.push(String(e)));
   page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
-  await page.goto(`${BASE}/?r=${r}&level=${level}&mute=1`, { waitUntil: 'load' });
+  await page.goto(`${BASE}/?r=${r}&level=${level}&char=${HOME_CHAR[level] || 'puff'}&mute=1`, { waitUntil: 'load' });
   await page.waitForFunction(() => window.__ready === true, { timeout: 20000 });
   page._errs = errors;
   return page;
 }
+const HOME_CHAR = { 1: 'puff', 2: 'mango', 3: 'cinder', 4: 'glacia', 5: 'volt' };
 const DET_KEYS = ['x', 'y', 'vx', 'vy', 'frame', 'deaths', 'won', 'coins'];
 
 async function evalArena(r, level) {

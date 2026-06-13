@@ -8,6 +8,7 @@ const SRC = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../src')
 const ARENA = process.env.ARENA || '1';
 const [S0, S1] = (process.env.SEEDS || '1-24').split('-').map(Number);
 const PAR = Number(process.env.PAR || 6);
+const HOME_CHAR = { 1: 'puff', 2: 'mango', 3: 'cinder', 4: 'glacia', 5: 'volt' };
 const MIME = { '.html': 'text/html', '.js': 'text/javascript' };
 const server = http.createServer((req, res) => { let u = req.url.split('?')[0]; if (u === '/') u = '/index.html'; const f = path.join(SRC, u); if (!fs.existsSync(f)) { res.writeHead(404); return res.end(); } res.writeHead(200, { 'content-type': MIME[path.extname(f)] || 'application/octet-stream' }); fs.createReadStream(f).pipe(res); });
 await new Promise(r => server.listen(0, r));
@@ -18,7 +19,7 @@ const results = [];
 async function run(seed) {
   const p = await browser.newPage({ viewport: { width: 960, height: 540 } });
   try {
-    await p.goto(`${BASE}/?r=webgl&level=${ARENA}&seed=${seed}&mute=1`, { waitUntil: 'load', timeout: 45000 });
+    await p.goto(`${BASE}/?r=${process.env.R || 'headless'}&level=${ARENA}&seed=${seed}&char=${HOME_CHAR[ARENA]}&mute=1`, { waitUntil: 'load', timeout: 45000 });
     await p.waitForFunction(() => window.__ready === true, { timeout: 20000 });
     const s = await p.evaluate(() => window.__gate(10000));
     const fun = await p.evaluate(() => window.__fun());

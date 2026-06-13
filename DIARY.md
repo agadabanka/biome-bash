@@ -87,6 +87,22 @@ A flight recorder (`window.__tape`, last 110 player frames, dumped per KO) +
   stocks 2 vs your 3 (the classic 1-v-many handicap), endgame aggression
   (no 1v1 zoning stalls), sudden death at 2:00.
 
+## The headless unlock (engine investment)
+Scanning for authored max-FUN matches meant simulating whole 110-second matches
+over and over — and under software GL each one rendered ~7,000 frames at a crawl
+(~100s each). A full 5-arena seed scan was a **6-hour** job.
+
+The fix landed in the SDK: a **sim-only headless mode**. `?r=headless` boots
+Phaser HEADLESS, and two engine changes make the procedural-art game survive
+having no renderer — `Studio.Textures.bake` skips `generateTexture` when
+`Studio._headless` is set (Phaser falls back to a placeholder texture; pixels are
+never shown anyway), and `Studio.harness` stubs a no-op renderer so `game.step()`
+runs the update loop (physics + brawl logic + the event log) without a render
+pass. The deterministic sim is **byte-identical** to a rendered run — arena 1
+seed 7 returns the same won/falls/frame/KOs and the same FUN 100 either way — but
+runs in **1.5s instead of ~100s (~70x)**. The 6-hour scan became ~2 minutes.
+Every future rng-driven game inherits headless seed-scanning.
+
 ## Art & music
 - **Backdrops**: five Gemini biome paintings (16:9, bottom third kept
   gameplay-clean) + title keyart of the whole roster. Characters deliberately

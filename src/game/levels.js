@@ -7,7 +7,7 @@
  */
 window.ARENAS = [
   {
-    name: 'Cumulus Courtyard', biome: 'Clouds', key: 'clouds', seed: 9, // authored match: flawless champion run (f4485)
+    name: 'Cumulus Courtyard', biome: 'Clouds', key: 'clouds', seed: 7, // authored match: FUN 100 — comeback win, 1 fall, 4 KOs (f6798)
     width: 960, height: 540,
     sky: { top: 0x7fb8ff, bottom: 0xdff1ff },
     layers: [
