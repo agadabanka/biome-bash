@@ -216,12 +216,13 @@
     if (hud) hud.reset();
   }
 
+  var TM = (window.Phaser && Phaser.TintModes) || { FILL: 1, MULTIPLY: 0 };
   function flashRig(f, frames) {
     f._flash = frames;
-    rigImages(f.rig).forEach(function (im) { im.setTintFill(0xffffff); });
+    rigImages(f.rig).forEach(function (im) { im.setTint(0xffffff); if (im.setTintMode) im.setTintMode(TM.FILL); });
   }
-  function tintRig(f, color) { rigImages(f.rig).forEach(function (im) { im.setTint(color); }); }
-  function clearRigTint(f) { rigImages(f.rig).forEach(function (im) { im.clearTint(); }); }
+  function tintRig(f, color) { rigImages(f.rig).forEach(function (im) { if (im.setTintMode) im.setTintMode(TM.MULTIPLY); im.setTint(color); }); }
+  function clearRigTint(f) { rigImages(f.rig).forEach(function (im) { if (im.setTintMode) im.setTintMode(TM.MULTIPLY); im.clearTint(); }); }
 
   function announce(str, color, size, y) {
     Studio.Juice.pop(scene, W / 2, y || 200, str, { color: color || '#ffffff', size: size || 46, dur: 800, rise: 26, grow: 1.3 });

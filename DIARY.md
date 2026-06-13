@@ -112,5 +112,30 @@ Every future rng-driven game inherits headless seed-scanning.
 - **Music**: six Lyria-composed loops (title + one per biome), trimmed to
   seamless ~29s mp3s.
 
+## The campaign (authored max-FUN matches)
+The seed scanner ran all five arenas headless; the highest-FUN winning seed per
+arena was baked in. Every winner is a **contested** win — the champion drops at
+least one stock and claws it back, which is exactly what the fun-gate rewards
+over a sweep.
+
+| # | Arena | Biome | You play | Authored match | FUN |
+|---|-------|-------|----------|----------------|-----|
+| 1 | Cumulus Courtyard | Clouds | Puff | seed 7 — 1 fall, 4 KOs, ~113s | **100** |
+| 2 | Canopy Clash | Jungle | Mango | seed 2 — 2 falls, 2 KOs, ~129s | **85** |
+| 3 | Caldera Rim | Volcano | Cinder | seed 5 — 1 fall, 3 KOs, ~58s | **97** |
+| 4 | Glacier Shelf | Glacier | Glacia | seed 11 — 1 fall, 3 KOs, ~118s | **95.3** |
+| 5 | Neon Rooftops | Neon City | Volt | seed 10 — 1 fall, 4 KOs, ~93s | **100** |
+
+**Campaign mean FUN ≈ 95.5**, every arena a win, every win a comeback. The
+campaign also exercises all five fighters as the player (one per biome), so the
+gate covers the whole roster.
+
 ## Scorecard
-(to be finalized after the full eval + deploy + videos)
+- **Gate:** the Brawl fun-gate — deterministic + champion WINS + match FUN ≥ 70,
+  on **webgl + canvas**. All five arenas pass (FUN 85–100).
+- **Determinism:** two fresh 700-step runs are bit-identical per arena/renderer.
+- **Art:** five Gemini biome backdrops + roster keyart; characters are procedural
+  Studio.Toon rigs (17 animation states) with live mood-mirroring HUD portraits.
+- **Music:** six Lyria loops (title + one per biome).
+- **Engine funded:** Studio.Toon, Studio.Brawl, Studio.Brawl.fun, Studio.RNG, new
+  Juice surfaces, and sim-only headless mode (~70x faster scan/gate).

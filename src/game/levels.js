@@ -7,7 +7,7 @@
  */
 window.ARENAS = [
   {
-    name: 'Cumulus Courtyard', biome: 'Clouds', key: 'clouds', seed: 7, // authored match: FUN 100 — comeback win, 1 fall, 4 KOs (f6798)
+    name: 'Cumulus Courtyard', biome: 'Clouds', key: 'clouds', seed: 7, // authored match: FUN 100 (Puff, 1 fall, 4 KOs)
     width: 960, height: 540,
     sky: { top: 0x7fb8ff, bottom: 0xdff1ff },
     layers: [
@@ -25,7 +25,7 @@ window.ARENAS = [
     items: [{ x: 480, y: 392 }, { x: 310, y: 272 }, { x: 650, y: 272 }, { x: 480, y: 172 }]
   },
   {
-    name: 'Canopy Clash', biome: 'Jungle', key: 'jungle', seed: 5, // authored match: flawless champion run (f5567)
+    name: 'Canopy Clash', biome: 'Jungle', key: 'jungle', seed: 2, // authored match: FUN 85 (Mango, 2 falls — contested)
     width: 960, height: 540,
     sky: { top: 0x14452f, bottom: 0x5da271 },
     layers: [
@@ -43,7 +43,7 @@ window.ARENAS = [
     items: [{ x: 480, y: 400 }, { x: 282, y: 296 }, { x: 668, y: 258 }, { x: 450, y: 182 }]
   },
   {
-    name: 'Caldera Rim', biome: 'Volcano', key: 'volcano', seed: 33,
+    name: 'Caldera Rim', biome: 'Volcano', key: 'volcano', seed: 5, // authored match: FUN 97 (Cinder, 1 fall)
     width: 960, height: 540,
     sky: { top: 0x2b0a0e, bottom: 0x8c2f1b },
     layers: [
@@ -62,7 +62,7 @@ window.ARENAS = [
     items: [{ x: 295, y: 390 }, { x: 665, y: 390 }, { x: 480, y: 260 }, { x: 480, y: 160 }]
   },
   {
-    name: 'Glacier Shelf', biome: 'Glacier', key: 'glacier', seed: 44,
+    name: 'Glacier Shelf', biome: 'Glacier', key: 'glacier', seed: 11, // authored match: FUN 95 (Glacia, 1 fall)
     width: 960, height: 540,
     sky: { top: 0x16324f, bottom: 0x8ecae6 },
     layers: [
@@ -80,7 +80,7 @@ window.ARENAS = [
     items: [{ x: 480, y: 398 }, { x: 320, y: 290 }, { x: 640, y: 290 }, { x: 480, y: 182 }]
   },
   {
-    name: 'Neon Rooftops', biome: 'Neon City', key: 'neon', seed: 55,
+    name: 'Neon Rooftops', biome: 'Neon City', key: 'neon', seed: 10, // authored match: FUN 100 (Volt, 1 fall)
     width: 960, height: 540,
     sky: { top: 0x10002b, bottom: 0x3c096c },
     layers: [

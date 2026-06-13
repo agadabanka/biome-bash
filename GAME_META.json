@@ -30,12 +30,26 @@
     "scaffold": "done",
     "identity": "done",
     "levels": "done",
-    "gate": "wip",
+    "gate": "done",
     "feel": "done",
     "hero": "done",
     "art": "done",
     "music": "done",
     "deploy": "todo",
     "videos": "todo"
+  },
+  "scorecard": {
+    "date": "2026-06-13",
+    "gate": "Brawl fun-gate — det + WIN + FUN>=70, webgl+canvas",
+    "verdict": "10/10 PASS (5 arenas x 2 renderers)",
+    "campaignFun": 95.5,
+    "perArena": {
+      "clouds": 100,
+      "jungle": 85,
+      "volcano": 97,
+      "glacier": 95.3,
+      "neon": 100
+    },
+    "everyWinAComeback": true
   }
 }

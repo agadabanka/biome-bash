@@ -56,7 +56,9 @@ async function evalArena(r, level) {
   const gate = await pg.evaluate((maxF) => window.__gate(maxF), BUDGET);
   const fun = await pg.evaluate(() => window.__fun());
   const errs = pg._errs.slice(0, 6);
-  if (r === 'webgl') await pg.screenshot({ path: path.join(OUT, `shot-l${level}.png`) });
+  // diagnostic shot is best-effort: a slow software-GL readback of a complex
+  // final frame must never fail the gate (the gate is det+won+fun).
+  if (r === 'webgl') { try { await pg.screenshot({ path: path.join(OUT, `shot-l${level}.png`), timeout: 90000 }); } catch (e) { console.log(`  (shot l${level} skipped: ${String(e).split('\n')[0].slice(0, 60)})`); } }
   await pg.close();
   const pass = !!(deterministic && gate && gate.won && fun.fun >= FUN_MIN);
   console.log(`  [${r}] arena ${level}: det=${deterministic} won=${gate.won} falls=${gate.deaths} kos=${gate.coins} f=${gate.frame} FUN=${fun.fun}${pass ? '  ✓' : '  ✗'}${errs.length ? '  errs:' + errs[0].slice(0, 120) : ''}`);
