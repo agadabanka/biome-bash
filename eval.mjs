@@ -65,6 +65,37 @@ async function evalArena(r, level) {
   return { level, deterministic, det: { s1, s2 }, gate, fun, errors: errs, pass };
 }
 
+// Menu smoke-test: a human boots through Title → Select → Play, NOT the
+// ?level=N shortcut the gate uses. This catches scene-flow bugs (e.g. Phaser 4
+// not binding plain-object config methods) that the gate can't see, and proves
+// keyboard movement actually drives the player. Renderer-independent → run once.
+async function menuFlow(r) {
+  const page = await browser.newPage({ viewport: { width: 960, height: 540 } });
+  const errs = [];
+  page.on('pageerror', e => errs.push(String(e)));
+  await page.goto(`${BASE}/?r=${r}&mute=1`, { waitUntil: 'load' });
+  await page.waitForFunction(() => window.__ready === true || (window.game && window.game.scene), { timeout: 20000 }).catch(() => {});
+  const scene = () => page.evaluate(() => window.game.scene.scenes.filter(s => s.sys.settings.status === 5).map(s => s.scene.key).join(','));
+  await page.waitForTimeout(900);
+  const s0 = await scene();
+  await page.keyboard.press('Space'); await page.waitForTimeout(700);      // Title → Select
+  const s1 = await scene();
+  await page.keyboard.press('ArrowRight'); await page.waitForTimeout(200);
+  await page.keyboard.press('Enter'); await page.waitForTimeout(500);      // confirm fighter
+  await page.keyboard.press('ArrowRight'); await page.waitForTimeout(200);
+  await page.keyboard.press('Enter'); await page.waitForTimeout(800);      // confirm arena → Play
+  const s2 = await scene();
+  await page.waitForTimeout(3300); // past the 3s countdown
+  const xA = await page.evaluate(() => window.__pX ? window.__pX() : null);
+  await page.keyboard.down('ArrowRight'); await page.waitForTimeout(900); await page.keyboard.up('ArrowRight');
+  const xB = await page.evaluate(() => window.__pX ? window.__pX() : null);
+  await page.close();
+  const moved = xA != null && xB != null && Math.abs(xB - xA) > 20;
+  const pass = s1 === 'Select' && s2 === 'Play' && moved && errs.length === 0;
+  console.log(`  [${r}] menu: Title→${s1}→${s2} · player ${xA}→${xB} (moved=${moved})${pass ? '  ✓' : '  ✗'}${errs.length ? '  ERR:' + errs[0].slice(0, 100) : ''}`);
+  return { s0, s1, s2, xA, xB, moved, errors: errs.slice(0, 4), pass };
+}
+
 async function readback(r) {
   const ps = await fresh(r, 1);
   await ps.evaluate(() => window.__run(300));
@@ -86,8 +117,9 @@ for (const r of RENDERERS) {
   try {
     const arenas = [];
     for (const lv of ARENA_LIST) arenas.push(await evalArena(r, lv));
+    const menu = await menuFlow(r);
     const rb = await readback(r);
-    results[r] = { renderer: r, arenas, readback: rb, pass: arenas.every(a => a.pass) && rb.nonblackRatio > 0.02 };
+    results[r] = { renderer: r, arenas, menu, readback: rb, pass: arenas.every(a => a.pass) && menu.pass && rb.nonblackRatio > 0.02 };
     console.log(`  [${r}] readback=${rb.nonblackRatio}  → ${results[r].pass ? 'PASS' : 'FAIL'}`);
   } catch (e) { results[r] = { renderer: r, fatal: String(e), pass: false }; console.log(`  [${r}] FATAL ${e}`); }
 }

@@ -138,39 +138,48 @@
       window.BAKE_CARD(this, 'selhl', 178, 280, 0xffd166, true);
       this.sel = this.add.image(this.cards[0].x, 246, 'selhl').setDepth(7);
       this.hint = this.add.text(W / 2, H - 26, '← → choose · ENTER/SPACE confirm', { fontFamily: 'Arial', fontSize: '16px', color: '#ffd166', stroke: '#16161e', strokeThickness: 4 }).setOrigin(0.5).setDepth(10);
-      // arena banners (hidden until phase 2)
       this.arenaTexts = [];
-      this.keys = this.input.keyboard.addKeys('LEFT,RIGHT,ENTER,SPACE');
-      this.keys.LEFT.on('down', function () { sc.move(-1); });
-      this.keys.RIGHT.on('down', function () { sc.move(1); });
-      var conf = function () { sc.confirm(); };
-      this.keys.ENTER.on('down', conf); this.keys.SPACE.on('down', conf);
-      this.refresh();
-    },
-    move: function (d) {
-      if (this.phase === 'char') this.ci = (this.ci + d + 5) % 5; else this.ai = (this.ai + d + 5) % 5;
-      this.refresh();
-    },
-    confirm: function () {
-      if (this.phase === 'char') {
-        this.phase = 'arena';
-        this.hdr.setText('CHOOSE YOUR ARENA');
-        for (var i = 0; i < 5; i++) {
-          var a = window.ARENAS[i];
-          this.arenaTexts.push(this.add.text(this.cards[i].x, 130, a.biome.toUpperCase(), { fontFamily: 'Arial Black, Arial', fontSize: '15px', color: '#ffffff', stroke: '#16161e', strokeThickness: 4 }).setOrigin(0.5).setDepth(8));
-          this.arenaTexts.push(this.add.text(this.cards[i].x, 385, a.name, { fontFamily: 'Arial', fontSize: '12px', fontStyle: 'bold', color: '#9bf6ff' }).setOrigin(0.5).setDepth(8));
-        }
-        this.refresh();
-      } else {
-        this.scene.start('Play', { ci: this.ci, ai: this.ai });
+
+      // Phaser 4 does NOT attach arbitrary config methods to the scene instance
+      // (only lifecycle hooks), so the menu logic lives here as closures bound to
+      // the scene — otherwise this.confirm/refresh are undefined and the player
+      // is stuck on Select (the "unplayable" bug; eval boots ?level past it).
+      function refresh() {
+        var idx = sc.phase === 'char' ? sc.ci : sc.ai;
+        var c = sc.cards[idx];
+        sc.sel.setPosition(c.x, 246);
+        sc.bio.setText(sc.phase === 'char' ? c.def.bio : window.ARENAS[idx].name + ' — ' + window.ARENAS[idx].biome);
+        for (var i = 0; i < 5; i++) Studio.Toon.set(sc.rigs[i], i === sc.ci && sc.phase === 'char' ? 'victory' : 'idle');
       }
-    },
-    refresh: function () {
-      var idx = this.phase === 'char' ? this.ci : this.ai;
-      var c = this.cards[idx];
-      this.sel.setPosition(c.x, 246);
-      this.bio.setText(this.phase === 'char' ? c.def.bio : window.ARENAS[idx].name + ' — ' + window.ARENAS[idx].biome);
-      for (var i = 0; i < 5; i++) Studio.Toon.set(this.rigs[i], i === this.ci && this.phase === 'char' ? 'victory' : 'idle');
+      function move(d) {
+        if (sc.phase === 'char') sc.ci = (sc.ci + d + 5) % 5; else sc.ai = (sc.ai + d + 5) % 5;
+        Studio.Audio.sfx('count'); refresh();
+      }
+      function confirm() {
+        if (sc.phase === 'char') {
+          sc.phase = 'arena';
+          sc.hdr.setText('CHOOSE YOUR ARENA');
+          for (var i = 0; i < 5; i++) {
+            var a = window.ARENAS[i];
+            sc.arenaTexts.push(sc.add.text(sc.cards[i].x, 130, a.biome.toUpperCase(), { fontFamily: 'Arial Black, Arial', fontSize: '15px', color: '#ffffff', stroke: '#16161e', strokeThickness: 4 }).setOrigin(0.5).setDepth(8));
+            sc.arenaTexts.push(sc.add.text(sc.cards[i].x, 385, a.name, { fontFamily: 'Arial', fontSize: '12px', fontStyle: 'bold', color: '#9bf6ff' }).setOrigin(0.5).setDepth(8));
+          }
+          Studio.Audio.sfx('go'); refresh();
+        } else {
+          Studio.Audio.sfx('go');
+          sc.scene.start('Play', { ci: sc.ci, ai: sc.ai });
+        }
+      }
+      sc.refresh = refresh; sc.move = move; sc.confirm = confirm;
+
+      this.keys = this.input.keyboard.addKeys('LEFT,RIGHT,ENTER,SPACE,A,D');
+      this.keys.LEFT.on('down', function () { move(-1); });
+      this.keys.RIGHT.on('down', function () { move(1); });
+      this.keys.A.on('down', function () { move(-1); });
+      this.keys.D.on('down', function () { move(1); });
+      this.keys.ENTER.on('down', confirm);
+      this.keys.SPACE.on('down', confirm);
+      refresh();
     },
     update: function (_, dms) {
       for (var i = 0; i < (this.rigs || []).length; i++) Studio.Toon.update(this.rigs[i], dms);
@@ -416,6 +425,7 @@
         });
       };
       window.__game.collect = function () {};
+      window.__pX = function () { return player ? Math.round(player.s.x) : null; }; // human-play verification hook
     },
     update: function (_, dms) {
       if (!world) return;
